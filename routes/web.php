@@ -437,6 +437,7 @@ if (!function_exists('petodb_fail')) {
             'tr' => [
                 'invalid_name' => 'Geçersiz isim.',
                 'db_locked' => 'Bu veritabanı açılamaz.',
+                'forbidden' => 'Bu sunucunun veritabanına erişilemez.',
                 'host_missing' => 'Host bulunamadı.',
                 'db_missing' => 'Veritabanı bulunamadı.',
                 'table_missing' => 'Tablo bulunamadı.',
@@ -448,7 +449,7 @@ if (!function_exists('petodb_fail')) {
                 'no_primary' => 'Bu tabloda primary key yok. Satır düzenlemek için bir primary key sütunu ekle.',
                 'primary_missing' => 'Primary key eksik.',
                 'query_forbidden' => 'Dosyada çalıştırılamayan bir sorgu var.',
-                'system_schema' => 'Sistem veritabanına erişiliyor: {name}.',
+                'system_schema' => 'Sistem veritabanına erişiliyor: !{name}.',
                 'query_type' => 'Bu sorgu tipine izin yok.',
                 'query_denied' => 'Bu sorguya izin yok.',
                 'bad_row' => 'Satır değerleri geçersiz.',
@@ -470,6 +471,7 @@ if (!function_exists('petodb_fail')) {
             'en' => [
                 'invalid_name' => 'Invalid name.',
                 'db_locked' => 'This database cannot be opened.',
+                'forbidden' => 'You cannot access this server database.',
                 'host_missing' => 'Host not found.',
                 'db_missing' => 'Database not found.',
                 'table_missing' => 'Table not found.',
@@ -481,7 +483,7 @@ if (!function_exists('petodb_fail')) {
                 'no_primary' => 'This table has no primary key. Add a primary key column to edit rows.',
                 'primary_missing' => 'Primary key is missing.',
                 'query_forbidden' => 'The file contains a statement that cannot be run.',
-                'system_schema' => 'Access to system database: {name}.',
+                'system_schema' => 'Access to system database: !{name}.',
                 'query_type' => 'This statement type is not allowed.',
                 'query_denied' => 'This statement is not allowed.',
                 'bad_row' => 'Row values are invalid.',
@@ -503,6 +505,7 @@ if (!function_exists('petodb_fail')) {
             'de' => [
                 'invalid_name' => 'Ungültiger Name.',
                 'db_locked' => 'Diese Datenbank kann nicht geöffnet werden.',
+                'forbidden' => 'Kein Zugriff auf die Datenbank dieses Servers.',
                 'host_missing' => 'Host nicht gefunden.',
                 'db_missing' => 'Datenbank nicht gefunden.',
                 'table_missing' => 'Tabelle nicht gefunden.',
@@ -514,7 +517,7 @@ if (!function_exists('petodb_fail')) {
                 'no_primary' => 'Diese Tabelle hat keinen Primärschlüssel. Fügen Sie eine Primärschlüsselspalte hinzu, um Zeilen zu bearbeiten.',
                 'primary_missing' => 'Primärschlüssel fehlt.',
                 'query_forbidden' => 'Die Datei enthält eine Anweisung, die nicht ausgeführt werden kann.',
-                'system_schema' => 'Zugriff auf Systemdatenbank: {name}.',
+                'system_schema' => 'Zugriff auf Systemdatenbank: !{name}.',
                 'query_type' => 'Dieser Anweisungstyp ist nicht erlaubt.',
                 'query_denied' => 'Diese Anweisung ist nicht erlaubt.',
                 'bad_row' => 'Zeilenwerte sind ungültig.',
@@ -536,6 +539,7 @@ if (!function_exists('petodb_fail')) {
             'fr' => [
                 'invalid_name' => 'Nom invalide.',
                 'db_locked' => 'Cette base ne peut pas être ouverte.',
+                'forbidden' => 'Accès à la base de ce serveur refusé.',
                 'host_missing' => 'Hôte introuvable.',
                 'db_missing' => 'Base introuvable.',
                 'table_missing' => 'Table introuvable.',
@@ -547,7 +551,7 @@ if (!function_exists('petodb_fail')) {
                 'no_primary' => 'Cette table n\'a pas de clé primaire. Ajoutez une colonne de clé primaire pour modifier les lignes.',
                 'primary_missing' => 'Clé primaire manquante.',
                 'query_forbidden' => 'Le fichier contient une requête qui ne peut pas être exécutée.',
-                'system_schema' => 'Accès à une base système : {name}.',
+                'system_schema' => 'Accès à une base système : !{name}.',
                 'query_type' => 'Ce type de requête n\'est pas autorisé.',
                 'query_denied' => 'Cette requête n\'est pas autorisée.',
                 'bad_row' => 'Valeurs de ligne invalides.',
@@ -569,6 +573,7 @@ if (!function_exists('petodb_fail')) {
             'ru' => [
                 'invalid_name' => 'Недопустимое имя.',
                 'db_locked' => 'Эту базу нельзя открыть.',
+                'forbidden' => 'Нет доступа к базе этого сервера.',
                 'host_missing' => 'Хост не найден.',
                 'db_missing' => 'База не найдена.',
                 'table_missing' => 'Таблица не найдена.',
@@ -580,7 +585,7 @@ if (!function_exists('petodb_fail')) {
                 'no_primary' => 'У таблицы нет первичного ключа. Добавьте столбец первичного ключа, чтобы править строки.',
                 'primary_missing' => 'Нет первичного ключа.',
                 'query_forbidden' => 'В файле есть запрос, который нельзя выполнить.',
-                'system_schema' => 'Обращение к системной базе: {name}.',
+                'system_schema' => 'Обращение к системной базе: !{name}.',
                 'query_type' => 'Этот тип запроса запрещён.',
                 'query_denied' => 'Этот запрос запрещён.',
                 'bad_row' => 'Недопустимые значения строки.',
@@ -620,6 +625,65 @@ if (!function_exists('petodb_fail')) {
         return preg_match('/^[a-z0-9_]+$/', $message) === 1 ? petodb_t($message) : $message;
     }
 
+    function petodb_client_server(string $serverShort): \Pterodactyl\Models\Server
+    {
+        $user = auth()->user();
+        if (!$user) {
+            throw new RuntimeException('forbidden');
+        }
+        $server = \Pterodactyl\Models\Server::query()->where('uuidShort', $serverShort)->first();
+        if (!$server) {
+            throw new RuntimeException('db_missing');
+        }
+        $allowed = (bool) $user->root_admin || (int) $server->owner_id === (int) $user->id;
+        if (!$allowed) {
+            $subuser = $server->subusers()->where('user_id', $user->id)->first();
+            $permissions = $subuser ? (array) $subuser->getAttribute('permissions') : [];
+            foreach ($permissions as $permission) {
+                if (is_string($permission) && str_starts_with($permission, 'database.')) {
+                    $allowed = true;
+                    break;
+                }
+            }
+        }
+        if (!$allowed) {
+            throw new RuntimeException('forbidden');
+        }
+
+        return $server;
+    }
+
+    function petodb_client_open(string $serverShort, string $schema): array
+    {
+        petodb_ident($schema);
+        $server = petodb_client_server($serverShort);
+        $database = Database::query()->with('host')->where('server_id', $server->id)->where('database', $schema)->first();
+        if (!$database || !$database->host) {
+            throw new RuntimeException('db_missing');
+        }
+        $host = $database->host;
+        config()->set('database.connections.dynamic', [
+            'driver' => 'mysql',
+            'host' => $host->host,
+            'port' => $host->port,
+            'database' => $schema,
+            'username' => $database->username,
+            'password' => decrypt($database->password),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+        ]);
+        DB::purge('dynamic');
+        $connection = DB::connection('dynamic');
+
+        return [$connection, $schema, [
+            'id' => $schema,
+            'name' => $schema,
+            'server' => $server->name,
+            'host' => $host->name,
+            'username' => $database->username,
+        ]];
+    }
+
     function petodb_guard(callable $callback)
     {
         try {
@@ -629,7 +693,7 @@ if (!function_exists('petodb_fail')) {
         } catch (InvalidArgumentException $exception) {
             return petodb_fail(petodb_maybe($exception->getMessage()));
         } catch (RuntimeException $exception) {
-            return petodb_fail(petodb_maybe($exception->getMessage()), 404);
+            return petodb_fail(petodb_maybe($exception->getMessage()), $exception->getMessage() === 'forbidden' ? 403 : 404);
         } catch (Throwable $exception) {
             return petodb_fail(petodb_t('connect_failed'));
         }
@@ -1047,6 +1111,458 @@ Route::middleware(['auth', AdminAuthenticate::class])->prefix('/hosts/{host}')->
     Route::post('/databases/{id}/import', function (Request $request, int $host, string $id) {
         return petodb_guard(function () use ($request, $host, $id) {
             [$connection, $schemaName] = petodb_open($host, $id);
+            $sql = (string) $request->input('sql', '');
+            if (trim($sql) === '') {
+                throw new InvalidArgumentException('sql_empty');
+            }
+            if (strlen($sql) > 8000000) {
+                throw new InvalidArgumentException('sql_size');
+            }
+            $statements = petodb_split_sql($sql);
+            if ($statements === []) {
+                throw new InvalidArgumentException('sql_none');
+            }
+            if (count($statements) > 10000) {
+                throw new InvalidArgumentException('sql_too_many');
+            }
+            $done = 0;
+            $skipped = 0;
+            $total = count($statements);
+            foreach ($statements as $offset => $statement) {
+                $index = $offset + 1;
+                try {
+                    $run = petodb_prepare_import($statement);
+                } catch (InvalidArgumentException $exception) {
+                    return petodb_import_stop($index, $total, $done, $exception->getMessage(), $statement);
+                }
+                if ($run === null) {
+                    $skipped++;
+                    continue;
+                }
+                try {
+                    $connection->unprepared($run);
+                } catch (QueryException $exception) {
+                    $code = (string) ($exception->errorInfo[1] ?? '');
+                    $detail = (string) ($exception->errorInfo[2] ?? petodb_t('query_failed'));
+                    $reason = ($code !== '' ? '#' . $code . ' — ' : '') . $detail;
+
+                    return petodb_import_stop($index, $total, $done, $reason, $run);
+                }
+                $done++;
+            }
+            if ($done === 0) {
+                throw new InvalidArgumentException('sql_no_data');
+            }
+
+            return response()->json([
+                'ok' => true,
+                'database' => $schemaName,
+                'statements' => $done,
+                'skipped' => $skipped,
+            ]);
+        });
+    })->where('id', '[A-Za-z0-9_]+');
+});
+
+Route::middleware(['auth'])->prefix('/client/{server}')->where(['server' => '[A-Za-z0-9]+'])->group(function () {
+    Route::get('/databases', function (string $server) {
+        return petodb_guard(function () use ($server) {
+            $record = petodb_client_server($server);
+            $rows = $record->databases()->orderBy('database')->get();
+
+            return response()->json([
+                'databases' => $rows->map(static function ($database) use ($record) {
+                    return [
+                        'id' => $database->database,
+                        'name' => $database->database,
+                        'server' => $record->name,
+                        'host' => '',
+                        'username' => $database->username,
+                    ];
+                })->all(),
+            ]);
+        });
+    });
+
+    Route::get('/databases/{id}/tables', function (string $server, string $id) {
+        return petodb_guard(function () use ($server, $id) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            $tables = $connection->select(
+                'SELECT table_name AS name, table_rows AS row_estimate, engine AS engine, table_collation AS collation, data_length AS data_length, index_length AS index_length, data_free AS data_free
+                 FROM information_schema.tables
+                 WHERE table_schema = ? AND table_type = ?
+                 ORDER BY table_name',
+                [$schemaName, 'BASE TABLE']
+            );
+
+            return response()->json([
+                'database' => $summary,
+                'tables' => array_map(static function ($table) {
+                    $table = (array) $table;
+                    $data = (int) $table['data_length'];
+                    $index = (int) $table['index_length'];
+
+                    return [
+                        'name' => (string) $table['name'],
+                        'rows' => (int) $table['row_estimate'],
+                        'engine' => (string) $table['engine'],
+                        'collation' => (string) $table['collation'],
+                        'data_length' => $data,
+                        'index_length' => $index,
+                        'size' => $data + $index,
+                        'overhead' => (int) $table['data_free'],
+                    ];
+                }, $tables),
+            ]);
+        });
+    })->where('id', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/tables', function (Request $request, string $server, string $id) {
+        return petodb_guard(function () use ($request, $server, $id) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            $name = (string) $request->input('name', '');
+            petodb_ident($name);
+            $connection->statement(
+                'CREATE TABLE ' . petodb_ident($name) . ' (`id` INT NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            );
+
+            return response()->json(['ok' => true, 'name' => $name]);
+        });
+    })->where('id', '[A-Za-z0-9_]+');
+
+    Route::delete('/databases/{id}/tables/{table}', function (string $server, string $id, string $table) {
+        return petodb_guard(function () use ($server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $connection->statement('DROP TABLE ' . petodb_ident($table));
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::get('/databases/{id}/tables/{table}', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $columns = petodb_columns($connection, $schemaName, $table);
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = 50;
+            $offset = ($page - 1) * $perPage;
+            $count = (array) $connection->selectOne('SELECT COUNT(*) AS total FROM ' . petodb_ident($table));
+            $rows = $connection->select(
+                'SELECT * FROM ' . petodb_ident($table) . ' LIMIT ' . $perPage . ' OFFSET ' . $offset
+            );
+
+            return response()->json([
+                'database' => $summary,
+                'table' => $table,
+                'columns' => $columns,
+                'primary' => petodb_primary($columns),
+                'rows' => array_map(static function ($row) {
+                    $out = [];
+                    foreach ((array) $row as $key => $value) {
+                        $out[$key] = petodb_cell($value);
+                    }
+
+                    return $out;
+                }, $rows),
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => (int) ($count['total'] ?? 0),
+            ]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/tables/{table}/rows', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $columns = petodb_columns($connection, $schemaName, $table);
+            $values = $request->input('values', []);
+            if (!is_array($values)) {
+                throw new InvalidArgumentException('bad_row');
+            }
+            $known = [];
+            foreach ($columns as $column) {
+                $known[$column['name']] = $column;
+            }
+            $names = [];
+            $bindings = [];
+            foreach ($values as $name => $value) {
+                $name = (string) $name;
+                if (!isset($known[$name])) {
+                    throw new InvalidArgumentException('unknown_column');
+                }
+                if (is_array($value)) {
+                    continue;
+                }
+                if (str_contains((string) $known[$name]['extra'], 'auto_increment') && ($value === null || $value === '')) {
+                    continue;
+                }
+                $names[] = petodb_ident($name);
+                $bindings[] = $value;
+            }
+            if ($names === []) {
+                $connection->statement('INSERT INTO ' . petodb_ident($table) . ' () VALUES ()');
+            } else {
+                $connection->insert(
+                    'INSERT INTO ' . petodb_ident($table) . ' (' . implode(', ', $names) . ') VALUES (' . implode(', ', array_fill(0, count($names), '?')) . ')',
+                    $bindings
+                );
+            }
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::put('/databases/{id}/tables/{table}/rows', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $columns = petodb_columns($connection, $schemaName, $table);
+            $values = $request->input('values', []);
+            $keys = $request->input('keys', []);
+            if (!is_array($values) || !is_array($keys)) {
+                throw new InvalidArgumentException('bad_row');
+            }
+            [$assignments, $valueBindings] = petodb_assignments($values, $columns, false);
+            [$where, $keyBindings] = petodb_where($keys, petodb_primary($columns));
+            $affected = $connection->update(
+                'UPDATE ' . petodb_ident($table) . ' SET ' . implode(', ', $assignments) . ' WHERE ' . $where . ' LIMIT 1',
+                array_merge($valueBindings, $keyBindings)
+            );
+            if ($affected < 1) {
+                throw new InvalidArgumentException('row_missing');
+            }
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::delete('/databases/{id}/tables/{table}/rows', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $keys = $request->input('keys', []);
+            if (!is_array($keys)) {
+                throw new InvalidArgumentException('primary_missing');
+            }
+            $columns = petodb_columns($connection, $schemaName, $table);
+            [$where, $bindings] = petodb_where($keys, petodb_primary($columns));
+            $affected = $connection->delete(
+                'DELETE FROM ' . petodb_ident($table) . ' WHERE ' . $where . ' LIMIT 1',
+                $bindings
+            );
+            if ($affected < 1) {
+                throw new InvalidArgumentException('row_missing');
+            }
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/tables/{table}/columns', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $name = (string) $request->input('name', '');
+            $type = petodb_type_sql((string) $request->input('type', ''), $request->input('length'), $request->input('scale'));
+            $nullable = $request->boolean('nullable', true);
+            $connection->statement(
+                'ALTER TABLE ' . petodb_ident($table) . ' ADD COLUMN ' . petodb_ident($name) . ' ' . $type . ' ' . ($nullable ? 'NULL' : 'NOT NULL')
+            );
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::patch('/databases/{id}/tables/{table}/columns/{column}', function (Request $request, string $server, string $id, string $table, string $column) {
+        return petodb_guard(function () use ($request, $server, $id, $table, $column) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $known = petodb_columns($connection, $schemaName, $table);
+            if (!collect($known)->firstWhere('name', $column)) {
+                throw new InvalidArgumentException('column_missing');
+            }
+            $name = (string) $request->input('name', $column);
+            $type = petodb_type_sql((string) $request->input('type', ''), $request->input('length'), $request->input('scale'));
+            $nullable = $request->boolean('nullable', true);
+            $connection->statement(
+                'ALTER TABLE ' . petodb_ident($table) . ' CHANGE ' . petodb_ident($column) . ' ' . petodb_ident($name) . ' ' . $type . ' ' . ($nullable ? 'NULL' : 'NOT NULL')
+            );
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+')->where('column', '[A-Za-z0-9_]+');
+
+    Route::delete('/databases/{id}/tables/{table}/columns/{column}', function (string $server, string $id, string $table, string $column) {
+        return petodb_guard(function () use ($server, $id, $table, $column) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $known = petodb_columns($connection, $schemaName, $table);
+            if (count($known) < 2) {
+                throw new InvalidArgumentException('last_column');
+            }
+            if (!collect($known)->firstWhere('name', $column)) {
+                throw new InvalidArgumentException('column_missing');
+            }
+            $connection->statement('ALTER TABLE ' . petodb_ident($table) . ' DROP COLUMN ' . petodb_ident($column));
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+')->where('column', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/tables/{table}/truncate', function (string $server, string $id, string $table) {
+        return petodb_guard(function () use ($server, $id, $table) {
+            [$connection, $schemaName] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $connection->statement('TRUNCATE TABLE ' . petodb_ident($table));
+
+            return response()->json(['ok' => true]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::get('/databases/{id}/tables/{table}/search', function (Request $request, string $server, string $id, string $table) {
+        return petodb_guard(function () use ($request, $server, $id, $table) {
+            [$connection, $schemaName, $summary] = petodb_client_open($server, $id);
+            petodb_assert_table($connection, $schemaName, $table);
+            $columns = petodb_columns($connection, $schemaName, $table);
+            $known = array_column($columns, 'name');
+            $column = (string) $request->query('column', '');
+            $op = (string) $request->query('op', 'like');
+            $value = (string) $request->query('q', '');
+            $ops = ['like' => 'LIKE', 'eq' => '=', 'ne' => '<>', 'gt' => '>', 'lt' => '<'];
+            if (!isset($ops[$op])) {
+                throw new InvalidArgumentException('bad_operator');
+            }
+            $bindings = [];
+            if ($column !== '') {
+                if (!in_array($column, $known, true)) {
+                    throw new InvalidArgumentException('unknown_column');
+                }
+                $where = petodb_ident($column) . ' ' . $ops[$op] . ' ?';
+                $bindings[] = $op === 'like' ? '%' . $value . '%' : $value;
+            } else {
+                $parts = [];
+                foreach ($known as $name) {
+                    $parts[] = 'CAST(' . petodb_ident($name) . ' AS CHAR) LIKE ?';
+                    $bindings[] = '%' . $value . '%';
+                }
+                $where = implode(' OR ', $parts);
+            }
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = 50;
+            $offset = ($page - 1) * $perPage;
+            $count = (array) $connection->selectOne('SELECT COUNT(*) AS total FROM ' . petodb_ident($table) . ' WHERE ' . $where, $bindings);
+            $rows = $connection->select(
+                'SELECT * FROM ' . petodb_ident($table) . ' WHERE ' . $where . ' LIMIT ' . $perPage . ' OFFSET ' . $offset,
+                $bindings
+            );
+
+            return response()->json([
+                'database' => $summary,
+                'table' => $table,
+                'columns' => $columns,
+                'primary' => petodb_primary($columns),
+                'rows' => array_map(static function ($row) {
+                    $out = [];
+                    foreach ((array) $row as $key => $cell) {
+                        $out[$key] = petodb_cell($cell);
+                    }
+
+                    return $out;
+                }, $rows),
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => (int) ($count['total'] ?? 0),
+            ]);
+        });
+    })->where('id', '[A-Za-z0-9_]+')->where('table', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/sql', function (Request $request, string $server, string $id) {
+        return petodb_guard(function () use ($request, $server, $id) {
+            [$connection] = petodb_client_open($server, $id);
+            $statements = petodb_split_sql((string) $request->input('sql', ''));
+            if ($statements === [] || count($statements) > 20) {
+                throw new InvalidArgumentException('sql_count');
+            }
+            $results = [];
+            foreach ($statements as $statement) {
+                petodb_assert_sql($statement);
+                $first = strtoupper((string) strtok(ltrim($statement), " \t\r\n("));
+                if (in_array($first, ['SELECT', 'SHOW', 'DESCRIBE', 'DESC', 'EXPLAIN', 'CHECK'], true)) {
+                    $rows = array_slice($connection->select($statement), 0, 200);
+                    $mapped = array_map(static function ($row) {
+                        $out = [];
+                        foreach ((array) $row as $key => $cell) {
+                            $out[$key] = petodb_cell($cell);
+                        }
+
+                        return $out;
+                    }, $rows);
+                    $results[] = [
+                        'statement' => $statement,
+                        'columns' => $mapped === [] ? [] : array_keys($mapped[0]),
+                        'rows' => $mapped,
+                    ];
+                    continue;
+                }
+                $affected = $connection->affectingStatement($statement);
+                $results[] = [
+                    'statement' => $statement,
+                    'affected' => $affected,
+                ];
+            }
+
+            return response()->json(['results' => $results]);
+        });
+    })->where('id', '[A-Za-z0-9_]+');
+
+    Route::get('/databases/{id}/export', function (Request $request, string $server, string $id) {
+        return petodb_guard(function () use ($request, $server, $id) {
+            [$connection, $schemaName] = petodb_client_open($server, $id);
+            $wanted = $request->query('tables');
+            $names = [];
+            if (is_string($wanted) && $wanted !== '') {
+                foreach (explode(',', $wanted) as $name) {
+                    petodb_ident($name);
+                    $names[] = $name;
+                }
+            }
+            $tables = $connection->select(
+                'SELECT table_name AS name FROM information_schema.tables WHERE table_schema = ? AND table_type = ? ORDER BY table_name',
+                [$schemaName, 'BASE TABLE']
+            );
+            $sql = '-- Peto DB export ' . $schemaName . "\n\n";
+            foreach ($tables as $table) {
+                $name = (string) ((array) $table)['name'];
+                if ($names !== [] && !in_array($name, $names, true)) {
+                    continue;
+                }
+                petodb_assert_table($connection, $schemaName, $name);
+                $create = array_change_key_case((array) $connection->selectOne('SHOW CREATE TABLE ' . petodb_ident($name)), CASE_LOWER);
+                $createSql = (string) ($create['create table'] ?? '');
+                $sql .= 'DROP TABLE IF EXISTS ' . petodb_ident($name) . ";\n" . $createSql . ";\n\n";
+                $rows = $connection->select('SELECT * FROM ' . petodb_ident($name) . ' LIMIT 2000');
+                foreach ($rows as $row) {
+                    $row = (array) $row;
+                    $cols = implode(', ', array_map(static fn ($key) => petodb_ident((string) $key), array_keys($row)));
+                    $vals = implode(', ', array_map('petodb_sql_value', array_values($row)));
+                    $sql .= 'INSERT INTO ' . petodb_ident($name) . ' (' . $cols . ') VALUES (' . $vals . ");\n";
+                }
+                $sql .= "\n";
+            }
+
+            return response($sql, 200, [
+                'Content-Type' => 'application/sql; charset=UTF-8',
+                'Content-Disposition' => 'attachment; filename="' . $schemaName . '.sql"',
+            ]);
+        });
+    })->where('id', '[A-Za-z0-9_]+');
+
+    Route::post('/databases/{id}/import', function (Request $request, string $server, string $id) {
+        return petodb_guard(function () use ($request, $server, $id) {
+            [$connection, $schemaName] = petodb_client_open($server, $id);
             $sql = (string) $request->input('sql', '');
             if (trim($sql) === '') {
                 throw new InvalidArgumentException('sql_empty');

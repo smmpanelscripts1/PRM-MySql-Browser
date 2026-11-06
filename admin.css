@@ -1,3 +1,11 @@
+#petodb { margin-top: 16px; }
+
+body.bg-neutral-800 #petodb {
+  max-width: 1200px;
+  margin: 8px auto 32px;
+  padding: 0 16px;
+}
+
 .pma {
   --line: #d5d5d5;
   --head: #e7eef4;
