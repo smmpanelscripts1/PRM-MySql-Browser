@@ -1,0 +1,425 @@
+.pma {
+  --line: #d5d5d5;
+  --head: #e7eef4;
+  --alt: #f4f8fb;
+  --hover: #fff6cc;
+  --link: #235a81;
+  --nav: #f3f3f3;
+  --ink: #333;
+  display: grid;
+  grid-template-columns: 228px minmax(0, 1fr);
+  align-items: start;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: "Segoe UI", "Open Sans", Tahoma, Verdana, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.pma * { box-sizing: border-box; }
+
+@media (max-width: 900px) {
+  .pma { grid-template-columns: 1fr; }
+}
+
+.pma-ico {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  display: inline-block;
+  vertical-align: -2px;
+}
+
+.pma-nav {
+  position: sticky;
+  top: 0;
+  background: var(--nav);
+  border-right: 1px solid var(--line);
+  padding: 8px 6px;
+  overflow: auto;
+  max-height: calc(100vh - 70px);
+}
+
+.pma-nav-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #666;
+  padding: 0 4px 6px;
+}
+
+.pma button,
+.pma input,
+.pma select,
+.pma textarea {
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.pma label {
+  font-weight: 400;
+  margin: 0;
+  color: var(--ink);
+}
+
+.pma-nav input[type="text"],
+.pma input[type="text"],
+.pma input[type="number"],
+.pma select,
+.pma textarea,
+.pma-input {
+  border: 1px solid #c5c5c5;
+  border-radius: 1px;
+  background: #fff;
+  color: #222;
+  padding: 2px 6px;
+  height: 24px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+}
+
+.pma-nav input[type="text"] { width: 100%; margin: 0 0 8px; }
+
+.pma textarea,
+.pma-sql {
+  width: 100%;
+  height: auto;
+  min-height: 140px;
+  padding: 8px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.pma-db { margin: 0 0 2px; }
+.pma-db-row, .pma-table-row { display: flex; align-items: center; min-height: 22px; }
+.pma-tables { margin-left: 14px; }
+
+.pma-disclosure,
+.pma-db-name,
+.pma-table-name {
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  cursor: pointer;
+  text-align: left;
+}
+
+.pma-disclosure {
+  width: 16px;
+  height: 20px;
+  padding: 0;
+  color: #777;
+  flex: 0 0 16px;
+}
+
+.pma-db-name,
+.pma-table-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 2px 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pma-db-name span,
+.pma-table-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pma-db-name { font-weight: 650; color: #1d3f5c; }
+.pma-db-name .pma-ico,
+.pma-table-name .pma-ico,
+.pma-tabs .pma-ico { color: #3d7ab5; }
+
+.pma-db-name:hover,
+.pma-table-name:hover { background: #e6e6e6; }
+
+.pma-db-name.is-active,
+.pma-table-name.is-active {
+  background: #d3e4f3;
+  color: #111;
+}
+
+.pma-main { min-width: 0; background: #fff; }
+
+.pma-crumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 4px 10px;
+  background: #fafafa;
+  border-bottom: 1px solid #ececec;
+  color: #555;
+}
+
+.pma-crumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1d3f5c;
+  font-weight: 650;
+}
+
+.pma-sep { color: #999; padding: 0 2px; }
+
+.pma-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: #f6f6f6;
+  border-bottom: 1px solid #ccc;
+  padding: 4px 6px 0;
+}
+
+.pma-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  background: transparent;
+  margin: 0 1px -1px;
+  padding: 6px 10px;
+  color: #333;
+  cursor: pointer;
+}
+
+.pma-tabs button:hover { background: #fff; color: #111; }
+
+.pma-tabs button.is-active {
+  background: #fff;
+  border-color: #ccc;
+  font-weight: 650;
+}
+
+.pma-body { padding: 8px 10px 12px; }
+.pma-status:empty { display: none; }
+.pma-status { padding: 8px 10px 0; }
+
+.pma-alert,
+.pma-notice {
+  padding: 5px 10px;
+  margin: 0 0 8px;
+  border: 1px solid #b2d87a;
+  background: #ebffd6;
+  color: #234000;
+}
+
+.pma-alert.bad {
+  background: #ffd6d6;
+  border-color: #e7a0a0;
+  color: #8d1d1d;
+}
+
+.pma-alert-text { white-space: pre-wrap; }
+
+.pma-sqlfail {
+  margin: 8px 0 0;
+  padding: 8px;
+  max-height: 220px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #e7a0a0;
+  color: #333;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.pma-bar,
+.pma-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  background: #f7f7f7;
+  border: 1px solid #e1e1e1;
+  padding: 5px 8px;
+  margin: 0 0 6px;
+}
+
+.pma-bar-meta { color: #555; }
+
+.pma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid #c8c8c8;
+  border-radius: 2px;
+  background: #fbfbfb;
+  color: #333;
+  cursor: pointer;
+}
+
+.pma-btn:hover { background: #fff; border-color: #999; }
+.pma-btn:disabled { opacity: .45; cursor: default; }
+
+.pma-btn.primary {
+  background: #3c7ab5;
+  border-color: #2d6294;
+  color: #fff;
+}
+
+.pma-btn.primary:hover { background: #32689c; }
+
+.pma-btn.warn {
+  background: #fff8e6;
+  border-color: #e0c98a;
+  color: #6a5200;
+}
+
+.pma-btn.danger {
+  background: #fff;
+  border-color: #e3b4b4;
+  color: #a32020;
+}
+
+.pma-btn.danger:hover { background: #fff1f1; }
+
+.pma-scroll { overflow-x: auto; }
+
+.pma-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin: 0;
+}
+
+.pma-table th,
+.pma-table td {
+  border: 1px solid #d7dee4;
+  padding: 3px 8px;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.pma-table th {
+  background: var(--head);
+  color: #24323d;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pma-table th .pma-ico { color: #b5811b; width: 11px; height: 11px; }
+
+.pma-table tbody tr:nth-child(even) td { background: #e7eef5; }
+.pma-table tbody tr:hover td { background: var(--hover); }
+.pma-table tfoot th { background: #f3f3f3; font-weight: 700; }
+
+.pma-table .pma-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pma-table .pma-ops { width: 1%; white-space: nowrap; padding-right: 4px; padding-left: 4px; }
+.pma-table .pma-check { width: 1%; text-align: center; padding: 0 6px; }
+
+.pma-name {
+  color: var(--link);
+  font-weight: 650;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pma-name:hover { text-decoration: underline; }
+
+.pma-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: none;
+  padding: 1px 5px;
+  color: var(--link);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pma-act:hover { text-decoration: underline; }
+.pma-act .pma-ico { color: #3d7ab5; }
+.pma-act.danger { color: #b30000; }
+.pma-act.danger .pma-ico { color: #c0392b; }
+.pma-act.warn { color: #8a5a00; }
+.pma-act.warn .pma-ico { color: #c48a12; }
+
+.pma-val {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pma-null { color: #8a8a8a; font-style: italic; }
+.pma-bin { color: #888; font-family: Consolas, monospace; }
+
+.pma-edit { min-width: 110px; }
+.pma-edit .pma-input,
+.pma-edit textarea.pma-input { width: 100%; min-width: 88px; }
+.pma-edit textarea.pma-input { height: 46px; min-height: 46px; }
+
+.pma-nullbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  color: #777;
+  font-size: 11px;
+}
+
+.pma-table tr.is-editing td { background: #fffdf4; vertical-align: top; }
+.pma-table tr.is-editing:hover td { background: #fffdf4; }
+
+.pma-box {
+  border: 1px solid #e1e1e1;
+  background: #fafafa;
+  padding: 8px;
+  margin-top: 10px;
+}
+
+.pma-box h4,
+.pma-legend {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.pma-checks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 2px;
+}
+
+.pma-checks label:hover { background: #f6f6f6; }
+
+.pma-lang { display: flex; flex-direction: column; gap: 4px; max-width: 280px; }
+.pma-lang button {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.pma-lang button:hover { border-color: #8eb4d4; }
+.pma-lang button.is-active {
+  border-color: #3c7ab5;
+  background: #e7f1fa;
+  font-weight: 650;
+}
+
+.pma-foot { margin-top: 6px; color: #555; }
+
+.pma-muted { color: #777; }
+.pma-key { color: #b5811b; font-size: 10px; font-weight: 700; margin-left: 4px; }
